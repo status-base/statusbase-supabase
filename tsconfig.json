@@ -3,5 +3,6 @@
   "extends": "./.nuxt/tsconfig.json",
   "compilerOptions": {
     "types": ["nuxt-windicss", "unplugin-icons/types/vue"]
-  }
+  },
+  "exclude": ["supabase/**/*.ts"]
 }

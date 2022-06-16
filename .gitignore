@@ -6,3 +6,7 @@ node_modules
 .output
 .env
 dist
+
+# Supabase
+**/supabase/.branches
+**/supabase/.temp
