@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { PropType } from "vue"
-import { Report } from "~~/utils/interface"
+import { Log } from "~~/utils/interface"
 import dayjs, { Dayjs } from "dayjs/esm"
 
 const props = defineProps({
-  data: Object as PropType<Report[]>,
+  data: Object as PropType<Log[]>,
 })
 const gridCount = useGridCount()
 const getDateArray = function (start: Date, days: number) {

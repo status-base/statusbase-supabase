@@ -1,14 +1,28 @@
 <script setup lang="ts">
-const { data: urls } = await useAsyncData("urls", () => queryContent("/urls").find())
-const { data: logs } = await useLazyAsyncData("logs", () => queryContent("/logs").find())
-const { data: incidents } = await useLazyAsyncData("reports", () =>
-  queryContent("/incidents").sort({ title: 0 }).find()
-)
+import { Url, Log } from "~~/utils/interface"
+
+const client = useSupabaseClient()
+
+const { data: urls } = await useAsyncData("urls", async () => {
+  const { data, error } = await client.from<Url>("urls").select("*")
+  if (error) throw Error(error.message)
+  return data
+})
+
+const { data: logs } = await useLazyAsyncData("logs", async () => {
+  const { data, error } = await client.from<Log>("logs").select("*")
+  if (error) throw Error(error.message)
+  return data
+})
+
+// const { data: incidents } = await useLazyAsyncData("reports", () =>
+//   queryContent("/incidents").sort({ title: 0 }).find()
+// )
 const gridCount = useGridCount()
 useCustomHead("StatusBase Status Page")
 
-const retrieveLogs = (path: string) => {
-  return logs.value?.find((i) => i._path.includes(path.split("/")[2]))
+const retrieveLogs = (url_id: string) => {
+  return logs.value?.filter((i) => i.url_id == url_id)
 }
 </script>
 
@@ -22,9 +36,9 @@ const retrieveLogs = (path: string) => {
     </div>
 
     <div class="flex flex-col items-center">
-      <Card :meta_data="url" :report_data="retrieveLogs(url._path)" v-for="url in urls" :key="url._id"></Card>
+      <Card :meta_data="url" :report_data="retrieveLogs(url.id)" v-for="url in urls" :key="url.id"></Card>
     </div>
 
-    <IncidentReport :incidents="incidents"></IncidentReport>
+    <!-- <IncidentReport :incidents="incidents"></IncidentReport> -->
   </div>
 </template>

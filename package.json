@@ -8,6 +8,7 @@
   },
   "devDependencies": {
     "@nuxtjs/supabase": "^0.1.16",
+    "@types/lodash-es": "^4.17.6",
     "nuxt": "3.0.0-rc.3",
     "nuxt-windicss": "^2.3.2",
     "unplugin-icons": "^0.14.3"
@@ -16,6 +17,7 @@
     "@iconify-json/carbon": "^1.1.5",
     "@vueuse/core": "^8.5.0",
     "dayjs": "^1.11.2",
+    "lodash-es": "^4.17.21",
     "vue-tippy": "^6.0.0-alpha.58"
   }
 }

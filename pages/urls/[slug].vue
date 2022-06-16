@@ -1,23 +1,36 @@
 <script setup lang="ts">
+import { Url, Log } from "~~/utils/interface"
+
 const {
   params: { slug },
 } = useRoute()
 
-const { data: url } = await useAsyncData(`url-${slug}`, () => queryContent(`/urls/${slug}`).findOne())
-const { data: log } = await useLazyAsyncData(`log-${slug}`, () => queryContent(`/logs/${slug}`).findOne())
-const { data: incidents } = await useLazyAsyncData(`incident-${slug}`, () =>
-  queryContent("/incidents")
-    .where({ application: { $contains: slug } })
-    .sort({ title: 0 })
-    .find()
-)
+const client = useSupabaseClient()
+const { data: url } = await useAsyncData(`url-${slug}`, async () => {
+  const { data, error } = await client.from<Url>("urls").select("*").eq("title", `${slug}`).single()
+  if (error) throw Error(error.message)
+  return data
+})
+
+const { data: logs } = await useLazyAsyncData(`log-${slug}`, async () => {
+  const { data, error } = await client.from<Log>("logs").select("*").eq("url_id", `${url.value.id}`)
+  if (error) throw Error(error.message)
+  return data
+})
+
+// const { data: incidents } = await useLazyAsyncData(`incident-${slug}`, () =>
+//   queryContent("/incidents")
+//     .where({ application: { $contains: slug } })
+//     .sort({ title: 0 })
+//     .find()
+// )
 const gridCount = useGridCount()
 useCustomHead(`${url.value.title} Status Page | StatusBase`)
 </script>
 
 <template>
   <div class="">
-    <OverallStatus :report_data="log"></OverallStatus>
+    <OverallStatus :report_data="logs"></OverallStatus>
 
     <div class="mt-12 md:mt-20 font-semibold inline-flex flex-col md:flex-row md:items-end">
       <h2 class="text-xl md:text-3xl">{{ url.title }}'s Uptime</h2>
@@ -25,9 +38,9 @@ useCustomHead(`${url.value.title} Status Page | StatusBase`)
     </div>
 
     <div class="flex flex-col items-center">
-      <Card :meta_data="url" :report_data="log"></Card>
+      <Card :meta_data="url" :report_data="logs"></Card>
     </div>
 
-    <IncidentReport :incidents="incidents"></IncidentReport>
+    <!-- <IncidentReport :incidents="incidents"></IncidentReport> -->
   </div>
 </template>

@@ -1,21 +1,19 @@
 <script setup lang="ts">
-import { ParsedContent } from "@nuxt/content/dist/runtime/types"
 import { PropType } from "vue"
 import { statusColor } from "~~/utils/function"
-import { Report } from "~~/utils/interface"
+import { Log, Report } from "~~/utils/interface"
+import { groupBy } from "lodash-es"
 
 const props = defineProps({
-  report_data: Object as PropType<ParsedContent[] | Pick<ParsedContent, string>>,
+  report_data: Object as PropType<Log[]>,
 })
 const { $dayjs } = useNuxtApp()
 
 const todayUptimeList = computed(() => {
-  let report_data = Array.isArray(props.report_data) ? props.report_data : [props.report_data]
-  return report_data.map((i) => {
+  let report_data = groupBy(props.report_data, "title")
+  return Object.values(report_data).map((i) => {
     if (!i) return
-    let todayData: number[] = i.body
-      .filter((j: Report) => $dayjs.utc(j.time).isToday())
-      .map((j: Report) => (j.status === "success" ? 1 : 0))
+    let todayData: number[] = i.filter((j) => $dayjs.utc(j.time).isToday()).map((j) => (j.status === "success" ? 1 : 0))
 
     return todayData.reduce((a, v) => a + v, 0) / todayData.length
   })
