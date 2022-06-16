@@ -3,16 +3,9 @@
 // This enables autocomplete, go to definition, etc.
 
 import { serve } from "https://deno.land/std@0.131.0/http/server.ts"
-import { createClient } from "https://esm.sh/@supabase/supabase-js@^1.33.2"
+import { supabaseClient } from "../../utils/client.ts"
 
 console.log("--- Health Check ---")
-
-const supabaseClient = createClient(
-  // Supabase API URL - env var exported by default when deployed.
-  Deno.env.get("SUPABASE_URL") ?? "",
-  // Supabase API ANON KEY - env var exported by default when deployed.
-  Deno.env.get("SUPABASE_ANON_KEY") ?? ""
-)
 
 serve(async () => {
   const statusData: any[] = []
