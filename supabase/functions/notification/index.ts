@@ -4,7 +4,7 @@
 
 import { serve } from "https://deno.land/std@0.131.0/http/server.ts"
 
-console.log("Hello from Functions!")
+console.log("--- Notification ---")
 
 serve(async (req) => {
   const { name } = await req.json()
@@ -12,10 +12,7 @@ serve(async (req) => {
     message: `Hello ${name}!`,
   }
 
-  return new Response(
-    JSON.stringify(data),
-    { headers: { "Content-Type": "application/json" } },
-  )
+  return new Response(JSON.stringify(data), { headers: { "Content-Type": "application/json" } })
 })
 
 // To invoke:

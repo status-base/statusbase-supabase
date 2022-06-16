@@ -5,7 +5,7 @@
 import { serve } from "https://deno.land/std@0.131.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@^1.33.2"
 
-console.log("Hello from Health Check!")
+console.log("--- Health Check ---")
 
 const supabaseClient = createClient(
   // Supabase API URL - env var exported by default when deployed.
