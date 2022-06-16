@@ -17,3 +17,12 @@ export interface Log {
   status: string
   urls?: Url[]
 }
+
+export interface Incident {
+  id: string /* primary key */
+  url_id?: string /* foreign key to urls.id */
+  created_at: string
+  resolved?: boolean
+  content?: string
+  urls?: Url
+}

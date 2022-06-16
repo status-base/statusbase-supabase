@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Url, Log } from "~~/utils/interface"
+import { Url, Log, Incident } from "~~/utils/interface"
 
 const client = useSupabaseClient()
 
@@ -15,9 +15,12 @@ const { data: logs } = await useLazyAsyncData("logs", async () => {
   return data
 })
 
-// const { data: incidents } = await useLazyAsyncData("reports", () =>
-//   queryContent("/incidents").sort({ title: 0 }).find()
-// )
+const { data: incidents } = await useLazyAsyncData("reports", async () => {
+  const { data, error } = await client.from<Incident>("incidents").select("*").order("created_at", { ascending: false })
+  if (error) throw Error(error.message)
+  return data
+})
+
 const gridCount = useGridCount()
 useCustomHead("StatusBase Status Page")
 
@@ -39,6 +42,6 @@ const retrieveLogs = (url_id: string) => {
       <Card :meta_data="url" :report_data="retrieveLogs(url.id)" v-for="url in urls" :key="url.id"></Card>
     </div>
 
-    <!-- <IncidentReport :incidents="incidents"></IncidentReport> -->
+    <IncidentReport :incidents="incidents"></IncidentReport>
   </div>
 </template>

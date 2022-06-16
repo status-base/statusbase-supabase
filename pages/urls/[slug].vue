@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Url, Log } from "~~/utils/interface"
+import { Url, Log, Incident } from "~~/utils/interface"
 
 const {
   params: { slug },
@@ -18,12 +18,16 @@ const { data: logs } = await useLazyAsyncData(`log-${slug}`, async () => {
   return data
 })
 
-// const { data: incidents } = await useLazyAsyncData(`incident-${slug}`, () =>
-//   queryContent("/incidents")
-//     .where({ application: { $contains: slug } })
-//     .sort({ title: 0 })
-//     .find()
-// )
+const { data: incidents } = await useLazyAsyncData(`incident-${slug}`, async () => {
+  const { data, error } = await client
+    .from<Incident>("incidents")
+    .select("*")
+    .eq("url_id", `${url.value.id}`)
+    .order("created_at", { ascending: false })
+  if (error) throw Error(error.message)
+  return data
+})
+
 const gridCount = useGridCount()
 useCustomHead(`${url.value.title} Status Page | StatusBase`)
 </script>
@@ -41,6 +45,6 @@ useCustomHead(`${url.value.title} Status Page | StatusBase`)
       <Card :meta_data="url" :report_data="logs"></Card>
     </div>
 
-    <!-- <IncidentReport :incidents="incidents"></IncidentReport> -->
+    <IncidentReport :incidents="incidents"></IncidentReport>
   </div>
 </template>
