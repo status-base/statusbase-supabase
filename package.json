@@ -1,5 +1,9 @@
 {
-  "private": true,
+  "name": "statusbase-supabase",
+  "version": "1.0.0",
+  "description": "A modern uptime monitoring tool & status page based on Supabase.",
+  "license": "MIT",
+  "author": "zernonia",
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
