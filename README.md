@@ -112,8 +112,9 @@ select
 
 ```
 
-5. Deploy site on any [platform](https://v3.nuxtjs.org/guide/deploy/presets)
-6. Celebrate! 🎉
+6. Populate the `urls` table with any url you want to monitor.
+7. Deploy site on any [platform](https://v3.nuxtjs.org/guide/deploy/presets)
+8. Celebrate! 🎉
 
 ## ➕ Contributing
 
