@@ -1,23 +1,23 @@
 <!-- PROJECT LOGO -->
 <br />
 <p align="center">
-  <a href="https://github.com/zernonia/statusbase">
+  <a href="https://github.com/status-base/statusbase-supabase">
     <img src="public/logo.svg" alt="Logo" width="80">
   </a>
 
-  <h3 align="center">StatusBase</h3>
+  <h3 align="center">StatusBase (Supabase)</h3>
 
   <p align="center">
-   Uptime monitoring tool & beautiful status pages <br><br> Powered by <a href="https://content.nuxtjs.org/" target="_blank"> Nuxt Content v2!</a>
+   Uptime monitoring tool & beautiful status pages <br><br> Powered by <a href="https://supabase.com/" target="_blank"> Supabase!</a>
     <br />
     <strong>Free • Open Source • Notification</strong>
     <br />
     <br />
     <a target="_blank" href="https://statusbase.vercel.app/">View Demo</a>
     ·
-    <a target="_blank" href="https://github.com/zernonia/statusbase/issues">Report Bug</a>
+    <a target="_blank" href="https://github.com/status-base/statusbase-supabase/issues">Report Bug</a>
     ·
-    <a target="_blank" href="https://github.com/zernonia/statusbase/issues">Request Feature</a>
+    <a target="_blank" href="https://github.com/status-base/statusbase-supabase/issues">Request Feature</a>
   </p>
 </p>
 
@@ -27,22 +27,20 @@
 
 I saw a lot of Status Page Software-as-a-Service (SAAS) out there lately, but I want to create one that allow users to freely host it themselves, and configure it to their hearts content.
 
-On top of that, I find that this a golden opportunity to play with [Nuxt Content v2](https://content.nuxtjs.org/) 😆
+This is the [Supabase](https://supabase.com) version of Statusbase!
 
 ## 🚀 Features
 
 - 🤩 Free
 - 📖 Open-Source
 - 🚀 Host it on [platforms](https://v3.nuxtjs.org/guide/deploy/presets)
-- 📝 Write incident report in Markdown
-- 0️⃣ Zero dependency on other service
-- 🔔 Email notifications when site is down
+- 🔔 Email notifications when site is down (WIP)
 
 ### 🔨 Built With
 
 - [Nuxt 3](https://v3.nuxtjs.org/)
-- [Nuxt Content v2](https://content.nuxtjs.org/)
 - [WindiCSS](https://windicss.org/)
+- [Supabase](https://supabase.com/)
 
 ## Setup instructions
 
@@ -50,28 +48,72 @@ On top of that, I find that this a golden opportunity to play with [Nuxt Content
 > This project is still under development
 
 1. Fork the repository
-2. Update `cron` frequency on `.github/workflows/health-check.yaml`
-3. Create `[name].yaml` on `/content/urls` (eg: doc.yaml)
-4. Copy the template below to your `yaml` file created in step 2
+2. Add your Supabase's Project URL & Key to `.env`
+3. Setup Edge function prerequisites by following [these steps.](https://supabase.com/docs/guides/functions#prerequisites)
+4. Deploy `health_check` function using script `supabase functions deploy health_check`
+5. Copy and paste this script in the same Supabase's project SQL Editor `https://app.supabase.com/project/<your-project-ref>/sql`
 
-```yaml
-url: "https://docs.zernonia.com"
-title: "Doc"
-description: "Documentation website for zernonia"
-# IMPORTANT! url must be first line
-# you can add any extra field here
+```sql
+-- Create table
+create table if not exists urls (
+  id uuid default uuid_generate_v4() primary key,
+  url text not null unique,
+  title text not null,
+  description text
+);
+
+create table if not exists logs (
+  id uuid default uuid_generate_v4() primary key,
+  url_id uuid references urls (id) on delete cascade,
+  time timestamp with time zone default timezone('utc'::text, now()) not null,
+  status text not null
+);
+
+create table if not exists incidents (
+  id uuid default uuid_generate_v4() primary key,
+  url_id uuid references urls (id) on delete cascade,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  resolved boolean,
+  content text
+);
+
+-- Enable RLS
+alter table urls enable row level security;
+alter table logs enable row level security;
+alter table incidents enable row level security;
+
+-- Create policy to allow public to read
+create policy allow_public_to_read on urls for select using (true);
+create policy allow_public_to_read on logs for select using (true);
+create policy allow_public_to_read on incidents for select using (true);
+
+-- CRON Job
+create extension if not exists pg_cron;
+create extension if not exists http;
+grant usage on schema cron to postgres;
+grant all privileges on all tables in schema cron to postgres;
+
+select
+  cron.schedule(
+    'health-check-every-15-minute', -- name of the cron job
+    '*/15 * * * *', -- every 15 minute
+    $$
+    select content::json
+    from
+      http((
+        'POST',
+        'https://<your-project-ref>.functions.supabase.co/health_check',
+        ARRAY[http_header('Authorization', 'Bearer <supabase-anon-key>')],
+        'application/json',
+        '{"hello": "world"}'
+      )::http_request)
+    $$
+  );
+
 ```
 
-5. Set up on any [platform](https://v3.nuxtjs.org/guide/deploy/presets) you ant
+5. Deploy site on any [platform](https://v3.nuxtjs.org/guide/deploy/presets)
 6. Celebrate! 🎉
-
-## How it works?
-
-This project uses GitHub actions to wake up every hour and run a shell script (`health-check.sh`). This script runs curl on every .yaml file in your `/content/urls` directory and appends the result of that run to a log file and commits it to the repository.
-
-All thanks to **Nuxt Content v2**, we easily fetch the log data, as well as documented incidents report easily and display it on the website.
-
-However, there's a downside with using GitHub Actions as CRON, which is the scheduled [delayed](https://github.community/t/scheduled-jobs-are-not-running-on-time/121271/6). Other than that, the current Nuxt Content v2 doesn't support [remote git sources yet](https://github.com/nuxt/content/issues/1049), so we have to rebuild the apps every 30 minutes (depending on the frequeny you set in `.github/workflows/health-check.yaml`), which is not ideal.
 
 ## ➕ Contributing
 
