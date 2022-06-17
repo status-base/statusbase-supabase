@@ -5,7 +5,7 @@
     </p>
 
     <div class="flex items-center">
-      <a target="_blank" href="https://github.com/zernonia/statusbase" class="mr-4">GitHub</a>
+      <a target="_blank" href="https://github.com/status-base/statusbase-supabase" class="mr-4">GitHub</a>
       <a href="https://www.buymeacoffee.com/zernonia" target="_blank"
         ><img
           src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png"
