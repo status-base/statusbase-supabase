@@ -2,7 +2,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/status-base/statusbase-supabase">
-    <img src="public/logo.svg" alt="Logo" width="80">
+    <img src="public/favicon.png" alt="Logo" width="80">
   </a>
 
   <h3 align="center">StatusBase (Supabase)</h3>
