@@ -15,9 +15,10 @@ watch(windowWidth, (n) => (gridCount.value = n > 768 ? 45 : n > 400 ? 30 : 20))
       <div class="mt-8 sm:mt-20 mb-10 flex flex-col sm:flex-row items-center justify-between">
         <NuxtLink
           to="/"
-          class="text-white text-3xl md:text-4xl font-semibold inline-flex items-center text-shadow-md shadow-purple-500"
+          class="text-white text-3xl md:text-4xl font-semibold inline-flex items-center justify-center text-shadow-md shadow-purple-500"
         >
-          <Logo class="mr-4"></Logo> StatusBase
+          <Logo class="mr-4"></Logo>
+          <span class="w-min md:w-auto"> StatusBase Supabase </span>
         </NuxtLink>
         <GithubButton class="mt-4 sm:mt-0"></GithubButton>
       </div>
