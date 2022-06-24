@@ -13,7 +13,11 @@ const { data: url } = await useAsyncData(`url-${slug}`, async () => {
 })
 
 const { data: logs } = await useLazyAsyncData(`log-${slug}`, async () => {
-  const { data, error } = await client.from<Log>("logs").select("*").eq("url_id", `${url.value.id}`)
+  const { data, error } = await client
+    .from<Log>("logs")
+    .select("*")
+    .eq("url_id", `${url.value.id}`)
+    .order("time", { ascending: false })
   if (error) throw Error(error.message)
   return data
 })
